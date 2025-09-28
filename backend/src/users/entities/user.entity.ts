@@ -1,5 +1,7 @@
+import { Exclude } from 'class-transformer';
 import { Ticket } from '../../tickets/entities/ticket.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 export enum UserRole {
   REQUESTER = 'requester',
@@ -18,6 +20,16 @@ export class User {
   @Column({ unique: true })
   email: string;
 
+  @Column()
+  @Exclude() // <-- Excluir este campo de las respuestas JSON
+  password: string;
+
+  // Hook para hashear la contraseña antes de guardar
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+
   @Column({
     type: 'enum',
     enum: UserRole,
@@ -27,4 +39,6 @@ export class User {
 
   @OneToMany(() => Ticket, (ticket) => ticket.requester)
   tickets: Ticket[];
+
+
 }

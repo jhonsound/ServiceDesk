@@ -4,7 +4,12 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from './users/entities/user.entity';
 import { Category } from './categories/entities/category.entity';
-import { CustomField, FieldType } from './categories/entities/custom-field.entity';
+import {
+  CustomField,
+  FieldType,
+} from './categories/entities/custom-field.entity';
+import * as bcrypt from 'bcrypt';
+import { Ticket } from './tickets/entities/ticket.entity';
 
 async function bootstrap() {
   // Creamos una aplicación NestJS standalone, sin levantar un servidor HTTP
@@ -17,32 +22,48 @@ async function bootstrap() {
   const categoryRepository = app.get<Repository<Category>>(
     getRepositoryToken(Category),
   );
-
+  const ticketRepository = app.get<Repository<Ticket>>(
+    getRepositoryToken(Ticket),
+  );
   try {
     // --- Limpieza de Tablas ---
     // Para que el script se pueda correr varias veces sin duplicar datos
     console.log('Cleaning old data...');
-    await categoryRepository.query('TRUNCATE "categories" RESTART IDENTITY CASCADE;');
+    await ticketRepository.query(
+      'TRUNCATE "ticket_history" RESTART IDENTITY CASCADE;',
+    );
+    await ticketRepository.query(
+      'TRUNCATE "ticket_custom_field_values" RESTART IDENTITY CASCADE;',
+    );
+    await ticketRepository.query(
+      'TRUNCATE "tickets" RESTART IDENTITY CASCADE;',
+    );
+    await categoryRepository.query(
+      'TRUNCATE "categories" RESTART IDENTITY CASCADE;',
+    );
     await userRepository.query('TRUNCATE "users" RESTART IDENTITY CASCADE;');
-    
+
     // --- 1. Creación de Usuarios ---
-    // Creamos un usuario para cada rol definido en el negocio 
+    // Creamos un usuario para cada rol definido en el negocio
     console.log('Seeding users...');
     const users = await userRepository.save([
       {
-        name: 'Ana Gómez',
+        name: 'Ana Gómez (Requester)',
         email: 'ana.gomez@empresa.com',
         role: UserRole.REQUESTER,
+        password: 'password123', // <-- Contraseña añadida
       },
       {
-        name: 'Carlos Ruiz',
+        name: 'Carlos Ruiz (Agent)',
         email: 'carlos.ruiz@empresa.com',
         role: UserRole.AGENT,
+        password: 'password123', // <-- Contraseña añadida
       },
       {
-        name: 'María Rodríguez',
+        name: 'María Rodríguez (Manager)',
         email: 'maria.rodriguez@empresa.com',
         role: UserRole.MANAGER,
+        password: 'password123', // <-- Contraseña añadida
       },
     ]);
     console.log(`${users.length} users seeded successfully.`);

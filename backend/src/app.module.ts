@@ -8,6 +8,8 @@ import { TicketCustomFieldValue } from './tickets/entities/ticket-custom-field-v
 import { Ticket } from './tickets/entities/ticket.entity';
 import { Category } from './categories/entities/category.entity';
 import { CustomField } from './categories/entities/custom-field.entity';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { AuthModule } from './auth/auth.module';
 // ... aquí van tus importaciones de configuración de TypeORM
 
 @Module({
@@ -50,6 +52,8 @@ import { CustomField } from './categories/entities/custom-field.entity';
     ]),
     CategoriesModule,
     TicketsModule,
+    DashboardModule,
+    AuthModule
   ],
   controllers: [],
   providers: [],

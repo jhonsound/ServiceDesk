@@ -1,6 +1,6 @@
 // src/tickets/tickets.controller.ts
 
-import { Controller, Post, Body, Get, Param, Patch, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, NotFoundException, UseGuards, Req } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketStatusDto } from './dto/update-ticket-status.dto';
@@ -9,8 +9,10 @@ import { UpdateTicketStatusDto } from './dto/update-ticket-status.dto';
 import { User, UserRole } from '../users/entities/user.entity'; 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('tickets')
+@UseGuards(JwtAuthGuard)
 export class TicketsController {
   constructor(
     private readonly ticketsService: TicketsService,
@@ -36,10 +38,11 @@ export class TicketsController {
   async changeStatus(
     @Param('id') id: string,
     @Body() updateTicketStatusDto: UpdateTicketStatusDto,
+    @Req() req: any,
   ) {
     // En una app real, esto sería @CurrentUser() currentUser: User
     // Para la prueba, simularemos que un 'Agent' hace el cambio
-    const currentUser = await this.userRepository.findOneBy({ role: UserRole.AGENT });
+    const currentUser = req.user as User;
     if (!currentUser) throw new NotFoundException(`user with not found`);
     return this.ticketsService.changeStatus(id, updateTicketStatusDto, currentUser);
   }

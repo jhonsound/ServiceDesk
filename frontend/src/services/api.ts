@@ -45,6 +45,7 @@ export interface Ticket {
   description: string;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   created_at: string;
+  sla_resolution_target: string;
   version: number;
   requester: User;
   category: Category;
@@ -56,6 +57,12 @@ export type UserRole = 'requester' | 'agent' | 'manager';
 export interface UpdateTicketStatusPayload {
   newStatus: 'open' | 'in_progress' | 'resolved' | 'closed';
   version: number;
+}
+
+export interface KpiData {
+  openTickets: number;
+  ticketsInLast7Days: number;
+  slaCompliancePercentage: number;
 }
 
 // URL base de tu API de NestJS
@@ -126,5 +133,16 @@ export const createTicket = async (ticketData: CreateTicketPayload): Promise<any
         throw new Error(errorData.message || 'Failed to create ticket');
     }
 
+    return response.json();
+};
+
+/**
+ * Obtiene los datos de KPIs para el dashboard.
+ */
+export const getKpis = async (): Promise<KpiData> => {
+    const response = await fetch(`${API_BASE_URL}/dashboard/kpis`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch KPI data');
+    }
     return response.json();
 };

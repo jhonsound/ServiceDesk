@@ -59,7 +59,12 @@ export default function TicketDetailView({
   const [ticket, setTicket] = useState(initialTicket);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const router = useRouter()
+  
+  const isSlaBreached =
+    ticket.status !== 'resolved' &&
+    ticket.status !== 'closed' &&
+    new Date() > new Date(ticket.sla_resolution_target);;
 
   // --- CAMBIO 2: Usamos useState para el rol del usuario ---
   const [currentUserRole, setCurrentUserRole] = useState<UserRole>("agent");
@@ -73,7 +78,7 @@ export default function TicketDetailView({
         newStatus,
         version: ticket.version,
       });
-      setTicket(updatedTicket);
+      /* setTicket(updatedTicket); */
       router.refresh();
     } catch (err: any) {
       setError(err.message);
