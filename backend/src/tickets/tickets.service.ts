@@ -1,10 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Ticket } from './entities/ticket.entity';
+import { Repository, OptimisticLockVersionMismatchError } from 'typeorm';
+import { Ticket, TicketStatus } from './entities/ticket.entity';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { UpdateTicketStatusDto } from './dto/update-ticket-status.dto';
 import { Category } from '../categories/entities/category.entity';
 import { User, UserRole } from '../users/entities/user.entity';
+import { TicketHistory, ActionType } from './entities/ticket-history.entity';
 import { TicketCustomFieldValue } from './entities/ticket-custom-field-value.entity';
 
 @Injectable()
@@ -16,6 +23,8 @@ export class TicketsService {
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(TicketHistory) // <--- Añadir repositorio de historial
+    private readonly ticketHistoryRepository: Repository<TicketHistory>,
   ) {}
 
   async create(createTicketDto: CreateTicketDto): Promise<Ticket> {
@@ -67,6 +76,125 @@ export class TicketsService {
       return fieldValue;
     });
 
-    return this.ticketRepository.save(newTicket);
+    const savedTicket = await this.ticketRepository.save(newTicket);
+
+    // --- Añadir registro de auditoría para la creación ---
+    await this.createHistoryEntry(
+      savedTicket,
+      requester,
+      ActionType.TICKET_CREATED,
+    );
+
+    return savedTicket;
+  }
+
+  /**
+   * Encuentra todos los tickets (para la vista de lista).
+   */
+  findAll(): Promise<Ticket[]> {
+    return this.ticketRepository.find({
+      relations: ['requester', 'category'],
+      order: { created_at: 'DESC' },
+    });
+  }
+
+  /**
+   * Encuentra un ticket por su ID con su historial.
+   */
+  findOne(id: string): Promise<Ticket|null> {
+    return this.ticketRepository.findOne({
+      where: { id },
+      relations: ['requester', 'category', 'history', 'history.user'],
+    });
+  }
+
+   /**
+   * Cambia el estado de un ticket, aplicando reglas de negocio.
+   */
+  async changeStatus(id: string, updateDto: UpdateTicketStatusDto, currentUser: User): Promise<Ticket> {
+    const { newStatus, version } = updateDto;
+    
+    const ticket = await this.ticketRepository.findOneBy({ id });
+    if (!ticket) throw new NotFoundException(`Ticket with ID ${id} not found`);
+
+    // 1. Lógica de Permisos (simplificada)
+    this.checkStatusChangePermission(ticket.status, newStatus, currentUser.role);
+    
+    const oldStatus = ticket.status;
+    ticket.status = newStatus;
+    ticket.version = version; // Asignamos la versión que nos envía el cliente
+
+    try {
+      // 2. Lógica de Concurrencia (Bloqueo Optimista)
+      const updatedTicket = await this.ticketRepository.save(ticket);
+      
+      // 3. Lógica de Auditoría
+      await this.createHistoryEntry(updatedTicket, currentUser, ActionType.STATUS_CHANGE, oldStatus, newStatus);
+      
+      return updatedTicket;
+    } catch (error) {
+      if (error instanceof OptimisticLockVersionMismatchError) {
+        throw new ConflictException('El ticket ha sido modificado por otra persona. Por favor, refresca la página.');
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Helper privado para crear entradas en el historial.
+   */
+  private createHistoryEntry(
+    ticket: Ticket,
+    user: User,
+    action: ActionType,
+    old_value?: string,
+    new_value?: string,
+  ) {
+    const historyEntry = this.ticketHistoryRepository.create({
+      ticket,
+      user,
+      action,
+      old_value,
+      new_value,
+    });
+    return this.ticketHistoryRepository.save(historyEntry);
+  }
+
+  /**
+   * Helper privado para validar las transiciones de estado.
+   */
+  private checkStatusChangePermission(
+    from: TicketStatus,
+    to: TicketStatus,
+    role: UserRole,
+  ) {
+    const allowedTransitions = {
+      [UserRole.AGENT]: {
+        [TicketStatus.OPEN]: [TicketStatus.IN_PROGRESS],
+        [TicketStatus.IN_PROGRESS]: [TicketStatus.RESOLVED],
+        [TicketStatus.RESOLVED]: [TicketStatus.CLOSED],
+      },
+      [UserRole.REQUESTER]: {
+        [TicketStatus.RESOLVED]: [
+          TicketStatus.IN_PROGRESS,
+          TicketStatus.CLOSED,
+        ],
+      },
+      [UserRole.MANAGER]: {
+        // El manager puede hacer todo
+        [TicketStatus.OPEN]: [TicketStatus.IN_PROGRESS],
+        [TicketStatus.IN_PROGRESS]: [TicketStatus.RESOLVED],
+        [TicketStatus.RESOLVED]: [
+          TicketStatus.IN_PROGRESS,
+          TicketStatus.CLOSED,
+        ],
+      },
+    };
+
+    if (!allowedTransitions[role]?.[from]?.includes(to)) {
+      throw new ForbiddenException(
+        `Rol '${role}' no puede cambiar el estado de '${from}' a '${to}'.`,
+      );
+    }
   }
 }

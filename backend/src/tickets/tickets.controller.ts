@@ -1,13 +1,46 @@
-import { Controller, Post, Body } from '@nestjs/common';
+// src/tickets/tickets.controller.ts
+
+import { Controller, Post, Body, Get, Param, Patch, NotFoundException } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { UpdateTicketStatusDto } from './dto/update-ticket-status.dto';
+// ¡Importante! En un proyecto real, el usuario vendría de un decorador de autenticación.
+// Para esta prueba, lo obtendremos del servicio.
+import { User, UserRole } from '../users/entities/user.entity'; 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Controller('tickets')
 export class TicketsController {
-  constructor(private readonly ticketsService: TicketsService) {}
+  constructor(
+    private readonly ticketsService: TicketsService,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
 
   @Post()
   create(@Body() createTicketDto: CreateTicketDto) {
     return this.ticketsService.create(createTicketDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.ticketsService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.ticketsService.findOne(id);
+  }
+
+  @Patch(':id/status')
+  async changeStatus(
+    @Param('id') id: string,
+    @Body() updateTicketStatusDto: UpdateTicketStatusDto,
+  ) {
+    // En una app real, esto sería @CurrentUser() currentUser: User
+    // Para la prueba, simularemos que un 'Agent' hace el cambio
+    const currentUser = await this.userRepository.findOneBy({ role: UserRole.AGENT });
+    if (!currentUser) throw new NotFoundException(`user with not found`);
+    return this.ticketsService.changeStatus(id, updateTicketStatusDto, currentUser);
   }
 }

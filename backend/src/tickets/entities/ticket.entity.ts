@@ -5,10 +5,12 @@ import {
   CreateDateColumn,
   ManyToOne,
   OneToMany,
+  VersionColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Category } from '../../categories/entities/category.entity';
 import { TicketCustomFieldValue } from './ticket-custom-field-value.entity';
+import { TicketHistory } from './ticket-history.entity';
 
 export enum TicketStatus {
   OPEN = 'open',
@@ -24,6 +26,9 @@ export class Ticket {
 
   @Column()
   title: string;
+
+  @VersionColumn() // <--- TypeORM manejará esto automáticamente
+  version: number;
 
   @Column('text')
   description: string;
@@ -52,6 +57,9 @@ export class Ticket {
 
   @ManyToOne(() => Category, (category) => category.tickets)
   category: Category;
+
+  @OneToMany(() => TicketHistory, (history) => history.ticket, { cascade: true })
+  history: TicketHistory[];
 
   @OneToMany(
     () => TicketCustomFieldValue,
