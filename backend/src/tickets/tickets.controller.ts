@@ -10,6 +10,7 @@ import { User, UserRole } from '../users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Controller('tickets')
 @UseGuards(JwtAuthGuard)
@@ -32,6 +33,16 @@ export class TicketsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ticketsService.findOne(id);
+  }
+
+  @Post(':id/comments')
+  addComment(
+    @Param('id') id: string,
+    @Body() createCommentDto: CreateCommentDto,
+    @Req() req: any,
+  ) {
+    const currentUser = req.user as User;
+    return this.ticketsService.addComment(id, createCommentDto, currentUser);
   }
 
   @Patch(':id/status')

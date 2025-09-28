@@ -32,6 +32,7 @@ export interface User {
   id: string;
   name: string;
   role: UserRole;
+  email?: string;
 }
 
 export interface TicketHistory {
@@ -48,7 +49,7 @@ export interface Ticket {
   id: string;
   title: string;
   description: string;
-  status: "open" | "in_progress" | "resolved" | "closed";
+  status: TicketStatus;
   created_at: string;
   sla_resolution_target: string;
   version: number;
@@ -61,6 +62,26 @@ export enum UserRole {
   REQUESTER = "requester",
   AGENT = "agent",
   MANAGER = "manager",
+}
+
+export enum TicketStatus {
+  OPEN = 'open',
+  IN_PROGRESS = 'in_progress',
+  RESOLVED = 'resolved',
+  CLOSED = 'closed',
+}
+
+export interface Ticket {
+  id: string;
+  title: string;
+  description: string;
+  status: TicketStatus; // <-- ACTUALIZA ESTA LÍNEA para que use el enum
+  created_at: string;
+  sla_resolution_target: string;
+  version: number;
+  requester: User;
+  category: Category;
+  history: TicketHistory[];
 }
 
 export interface UpdateTicketStatusPayload {
@@ -150,6 +171,22 @@ export const getTicketById = async (id: string): Promise<Ticket> => {
     throw new Error(`Failed to fetch ticket with id: ${id}`);
   }
   return response.json();
+};
+
+
+export const addCommentToTicket = async (id: string, comment: string): Promise<TicketHistory> => {
+    const response = await fetch(`${API_BASE_URL}/tickets/${id}/comments`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ comment }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to add comment');
+    }
+
+    return response.json();
 };
 
 export const updateTicketStatus = async (

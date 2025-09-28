@@ -13,6 +13,7 @@ import { Category } from '../categories/entities/category.entity';
 import { User, UserRole } from '../users/entities/user.entity';
 import { TicketHistory, ActionType } from './entities/ticket-history.entity';
 import { TicketCustomFieldValue } from './entities/ticket-custom-field-value.entity';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
 export class TicketsService {
@@ -86,6 +87,25 @@ export class TicketsService {
     );
 
     return savedTicket;
+  }
+
+   async addComment(id: string, createCommentDto: CreateCommentDto, currentUser: User): Promise<TicketHistory> {
+    const { comment } = createCommentDto;
+
+    const ticket = await this.ticketRepository.findOneBy({ id });
+    if (!ticket) {
+      throw new NotFoundException(`Ticket with ID ${id} not found`);
+    }
+
+    // Cualquier rol puede añadir comentarios según nuestra matriz de permisos
+    const historyEntry = this.ticketHistoryRepository.create({
+        ticket,
+        user: currentUser,
+        action: ActionType.COMMENT_ADDED,
+        comment: comment,
+    });
+
+    return this.ticketHistoryRepository.save(historyEntry);
   }
 
   /**
