@@ -89,7 +89,11 @@ export class TicketsService {
     return savedTicket;
   }
 
-   async addComment(id: string, createCommentDto: CreateCommentDto, currentUser: User): Promise<TicketHistory> {
+  async addComment(
+    id: string,
+    createCommentDto: CreateCommentDto,
+    currentUser: User,
+  ): Promise<TicketHistory> {
     const { comment } = createCommentDto;
 
     const ticket = await this.ticketRepository.findOneBy({ id });
@@ -99,10 +103,10 @@ export class TicketsService {
 
     // Cualquier rol puede añadir comentarios según nuestra matriz de permisos
     const historyEntry = this.ticketHistoryRepository.create({
-        ticket,
-        user: currentUser,
-        action: ActionType.COMMENT_ADDED,
-        comment: comment,
+      ticket,
+      user: currentUser,
+      action: ActionType.COMMENT_ADDED,
+      comment: comment,
     });
 
     return this.ticketHistoryRepository.save(historyEntry);
@@ -121,25 +125,36 @@ export class TicketsService {
   /**
    * Encuentra un ticket por su ID con su historial.
    */
-  findOne(id: string): Promise<Ticket|null> {
+  findOne(id: string): Promise<Ticket | null> {
     return this.ticketRepository.findOne({
       where: { id },
       relations: ['requester', 'category', 'history', 'history.user'],
     });
   }
 
-   /**
+  /**
    * Cambia el estado de un ticket, aplicando reglas de negocio.
    */
-  async changeStatus(id: string, updateDto: UpdateTicketStatusDto, currentUser: User): Promise<Ticket> {
+  async changeStatus(
+    id: string,
+    updateDto: UpdateTicketStatusDto,
+    currentUser: User,
+  ): Promise<Ticket> {
     const { newStatus, version } = updateDto;
-    
-    const ticket = await this.ticketRepository.findOneBy({ id });
+
+    const ticket = await this.ticketRepository.findOne({
+      where: { id },
+      relations: ['history', 'history.user'],
+    });
     if (!ticket) throw new NotFoundException(`Ticket with ID ${id} not found`);
 
     // 1. Lógica de Permisos (simplificada)
-    this.checkStatusChangePermission(ticket.status, newStatus, currentUser.role);
-    
+    this.checkStatusChangePermission(
+      ticket.status,
+      newStatus,
+      currentUser.role,
+    );
+
     const oldStatus = ticket.status;
     ticket.status = newStatus;
     ticket.version = version; // Asignamos la versión que nos envía el cliente
@@ -147,14 +162,22 @@ export class TicketsService {
     try {
       // 2. Lógica de Concurrencia (Bloqueo Optimista)
       const updatedTicket = await this.ticketRepository.save(ticket);
-      
+
       // 3. Lógica de Auditoría
-      await this.createHistoryEntry(updatedTicket, currentUser, ActionType.STATUS_CHANGE, oldStatus, newStatus);
-      
+      await this.createHistoryEntry(
+        updatedTicket,
+        currentUser,
+        ActionType.STATUS_CHANGE,
+        oldStatus,
+        newStatus,
+      );
+
       return updatedTicket;
     } catch (error) {
       if (error instanceof OptimisticLockVersionMismatchError) {
-        throw new ConflictException('El ticket ha sido modificado por otra persona. Por favor, refresca la página.');
+        throw new ConflictException(
+          'El ticket ha sido modificado por otra persona. Por favor, refresca la página.',
+        );
       }
       throw error;
     }
