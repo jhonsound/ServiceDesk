@@ -14,13 +14,16 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { getStatusVariant } from "@/lib/utils";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 // --- Sub-componente para renderizar el historial ---
 function TicketTimeline({ history }: { history: TicketHistory[] }) {
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
+      <h3 className="text-lg font-semibold text-white  mb-4">
         Historial del Ticket
       </h3>
       <div className="border-l-2 border-gray-200 ml-2">
@@ -33,25 +36,25 @@ function TicketTimeline({ history }: { history: TicketHistory[] }) {
             )
             .map((entry) => (
               <div key={entry.id} className="relative mb-8">
-                <div className="absolute -left-[11px] top-1 w-5 h-5 bg-blue-500 rounded-full"></div>
+                <div className="absolute -left-[11px] top-1 w-5 h-5 bg-gray-700 rounded-full"></div>
                 <div className="ml-8">
-                  <p className="font-semibold text-gray-700">
+                  <p className="font-semibold text-white">
                     {entry.user.name}{" "}
-                    <span className="text-gray-500 font-normal">
+                    <span className="text-white font-normal">
                       ({entry.user.role})
                     </span>
                   </p>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-white">
                     {entry.action === "status_change" &&
                       `Cambió el estado de "${entry.old_value}" a "${entry.new_value}"`}
                     {entry.action === "ticket_created" && "Creó el ticket"}
                     {entry.action === "comment_added" && (
-                      <div className="mt-1 p-3 bg-gray-100 rounded-md border">
+                      <div className="mt-1 p-3 bg-[#1a1a1a]  rounded-md border">
                         <p className="whitespace-pre-wrap">{entry.comment}</p>
                       </div>
                     )}
                   </div>
-                  <time className="text-xs text-gray-400 mt-1 inline-block">
+                  <time className="text-xs text-white mt-1 inline-block">
                     {new Date(entry.created_at).toLocaleString()}
                   </time>
                 </div>
@@ -82,6 +85,7 @@ export default function TicketDetailView() {
         setIsLoading(true);
         try {
           const data = await getTicketById(id);
+          console.log("🚀 ~ fetchTicket ~ data:", data)
           setTicket(data);
         } catch (err) {
           setError("No se pudo cargar el ticket.");
@@ -98,16 +102,17 @@ export default function TicketDetailView() {
     setError(null);
     try {
       // 1. Capturamos el ticket actualizado que devuelve la API
-      const updatedTicket = await updateTicketStatus(ticket!.id, {
+      const updatedTicketData  = await updateTicketStatus(ticket!.id, {
         newStatus,
         version: ticket!.version,
       });
 
-      // 2. Actualizamos nuestro estado local con el ticket completo y actualizado
-      setTicket(updatedTicket);
+    // PASO 2: Volver a pedir el ticket completo desde la fuente de verdad.
+      const freshTicketData = await getTicketById(ticket!.id);
+      console.log("🚀 ~ handleStatusChange ~ freshTicketData:", freshTicketData)
 
-      // 3. Ya no necesitamos router.refresh()
-      // router.refresh();
+      // PASO 3: Actualizar la UI con los datos 100% frescos y completos.
+      setTicket(freshTicketData);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -204,7 +209,7 @@ export default function TicketDetailView() {
     new Date() > new Date(ticket.sla_resolution_target);
 
   return (
-    <>
+    <div className="fle m-6">
       <div className="max-w-7xl mx-auto mb-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg text-sm">
         <p className="font-bold mb-2">Panel de Simulación:</p>
         <div className="flex items-center gap-4">
@@ -229,7 +234,7 @@ export default function TicketDetailView() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
         <div className="md:col-span-2 space-y-8">
-          <Card>
+          <Card className="bg-[#242424] border-none shadow-2xl">
             <CardHeader>
               {isSlaBreached && (
                 <div className="p-4 mb-4 bg-red-100 border-l-4 border-red-500 text-red-700">
@@ -237,21 +242,24 @@ export default function TicketDetailView() {
                   <p>El SLA de resolución ha sido incumplido.</p>
                 </div>
               )}
-              <CardTitle className="text-3xl">{ticket.title}</CardTitle>
-              <p className="text-sm text-gray-500">
+              <CardTitle className="text-3xl text-white">
+                {ticket.title}
+              </CardTitle>
+              <p className="text-sm text-white">
                 Solicitado por: {ticket.requester.name} el{" "}
                 {new Date(ticket.created_at).toLocaleDateString()}
               </p>
             </CardHeader>
-            <CardContent>
-              <p className="text-gray-700 whitespace-pre-wrap">
+
+            <CardContent className="max-h-[30vh] overflow-y-auto">
+              <p className="text-white whitespace-pre-wrap">
                 {ticket.description}
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-[#242424] border-none shadow-2xl">
             <CardHeader>
-              <CardTitle>Añadir un Comentario</CardTitle>
+              <CardTitle className="text-white">Añadir un Comentario</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleAddComment} className="space-y-4">
@@ -259,7 +267,7 @@ export default function TicketDetailView() {
                   placeholder="Escribe tu comentario aquí..."
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  className="min-h-[100px]"
+                  className="min-h-[100px] text-white bg-[#1a1a1a] border border-gray-700"
                 />
                 <Button
                   type="submit"
@@ -273,19 +281,29 @@ export default function TicketDetailView() {
         </div>
 
         <div className="space-y-6">
-          <Card>
+          <Card className="bg-[#242424] border-none shadow-2xl">
             <CardHeader>
-              <CardTitle>Estado y Acciones</CardTitle>
+              <CardTitle className="text-white">Estado y Acciones</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="mb-4">
+              <p className="mb-4 text-white">
                 Estado actual:{" "}
-                <Badge
-                  variant={ticket.status === "open" ? "default" : "secondary"}
-                >
-                  {ticket.status}
+                <Badge variant={getStatusVariant(ticket.status)}>
+                  {ticket.status.replace("_", " ")}
                 </Badge>
               </p>
+              <div className="text-sm text-gray-500 mb-4">
+                <p>
+                  <strong>Objetivo de Resolución:</strong>
+                </p>
+                <p>
+                  {format(
+                    new Date(ticket.sla_resolution_target),
+                    "d 'de' MMMM, yyyy 'a las' HH:mm",
+                    { locale: es }
+                  )}
+                </p>
+              </div>
               <div className="space-y-2">
                 {getAvailableActions().map((action) => (
                   <Button
@@ -306,16 +324,16 @@ export default function TicketDetailView() {
               )}
             </CardContent>
           </Card>
-          <Card>
+          <Card className="max-h-[50vh] bg-[#242424] overflow-y-auto">
             <CardHeader>
-              <CardTitle>Historial</CardTitle>
+              <CardTitle className="text-white">Historial</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="max-h-[30vh] overflow-y-auto text-white">
               <TicketTimeline history={ticket.history} />
             </CardContent>
           </Card>
         </div>
       </div>
-    </>
+    </div>
   );
 }

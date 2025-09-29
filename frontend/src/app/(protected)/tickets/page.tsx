@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { getTickets, Ticket, TicketStatus } from '@/services/api';
-import Dashboard from '@/components/dashboard/Dashboard';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getTickets, Ticket, TicketStatus } from "@/services/api";
+import Dashboard from "@/components/dashboard/Dashboard";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -22,25 +22,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from 'lucide-react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-
-// Helper para asignar colores a los Badges de estado
-const getStatusVariant = (status: TicketStatus) => {
-  switch (status) {
-    case 'open':
-      return 'default';
-    case 'in_progress':
-      return 'secondary';
-    case 'resolved':
-      return 'outline';
-    case 'closed':
-      return 'destructive';
-    default:
-      return 'default';
-  }
-};
+import { AlertTriangle, MoreHorizontal } from "lucide-react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { getStatusVariant } from "@/lib/utils";
 
 export default function TicketsListPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -52,9 +37,12 @@ export default function TicketsListPage() {
     const fetchTickets = async () => {
       try {
         const data = await getTickets();
+        console.log("🚀 ~ fetchTickets ~ data:", data)
         setTickets(data);
       } catch (err) {
-        setError('No se pudieron cargar los tickets. Por favor, intenta de nuevo.');
+        setError(
+          "No se pudieron cargar los tickets. Por favor, intenta de nuevo."
+        );
       } finally {
         setIsLoading(false);
       }
@@ -63,69 +51,93 @@ export default function TicketsListPage() {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full p-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard de Soporte</h1>
-        <Button asChild>
-            <Link href="/tickets/new">Crear Nuevo Ticket</Link>
+        <h1 className="text-3xl font-bold text-[#cbcbcb]">
+          Dashboard de Soporte
+        </h1>
+        <Button className="bg-gray-700" asChild>
+          <Link href="/tickets/new">Crear Nuevo Ticket</Link>
         </Button>
       </div>
-      
+
       <Dashboard />
 
-      <Card>
+      <Card className="bg-[#242424] border-none shadow-2xl max-h-85 overflow-auto">
         <CardHeader>
-          <CardTitle>Cola de Tickets</CardTitle>
+          <CardTitle className="text-white">Cola de Tickets</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="p-6 text-center">Cargando tickets...</p>
+            <p className="p-6 text-center text-white">Cargando tickets...</p>
           ) : error ? (
             <p className="p-6 text-center text-red-600">{error}</p>
           ) : (
-            <Table>
+            <Table className="bg-[#242424] ">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Título</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Solicitante</TableHead>
-                  <TableHead>Fecha Creación</TableHead>
-                  <TableHead>SLA</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead className="text-white">Título</TableHead>
+                  <TableHead className="text-white">Estado</TableHead>
+                  <TableHead className="text-white">Solicitante</TableHead>
+                  <TableHead className="text-white">Fecha Creación</TableHead>
+                  <TableHead className="text-white">SLA</TableHead>
+                  <TableHead className="text-right text-white">
+                    Acciones
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {tickets.map((ticket) => {
                   const isSlaBreached =
-                    ticket.status !== 'resolved' &&
-                    ticket.status !== 'closed' &&
+                    ticket.status !== "resolved" &&
+                    ticket.status !== "closed" &&
                     new Date() > new Date(ticket.sla_resolution_target);
 
                   return (
                     <TableRow key={ticket.id}>
-                      <TableCell className="font-medium">{ticket.title}</TableCell>
-                      <TableCell>
+                      <TableCell className="font-medium text-white">
+                        {ticket.title}
+                      </TableCell>
+                      <TableCell className="text-white">
                         <Badge variant={getStatusVariant(ticket.status)}>
-                          {ticket.status.replace('_', ' ')}
+                          {ticket.status.replace("_", " ")}
                         </Badge>
                       </TableCell>
-                      <TableCell>{ticket.requester.name}</TableCell>
-                      <TableCell>
-                        {format(new Date(ticket.created_at), "d 'de' MMMM, yyyy", { locale: es })}
+                      <TableCell className="text-white">
+                        {ticket.requester.name}
+                      </TableCell>
+                      <TableCell className="text-white">
+                        {format(
+                          new Date(ticket.created_at),
+                          "d 'de' MMMM, yyyy",
+                          { locale: es }
+                        )}
                       </TableCell>
                       <TableCell>
-                        {isSlaBreached && <span title="SLA Incumplido" className="text-red-500 font-bold">⚠️ Vencido</span>}
+                        {isSlaBreached && (
+                          <span className="flex items-center text-red-500 font-semibold">
+                            <AlertTriangle className="h-4 w-4 mr-1.5" />{" "}
+                            {/* Usamos un icono para que sea más claro */}
+                            Vencido
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Abrir menú</span>
-                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only text-white">
+                                Abrir menú
+                              </span>
+                              <MoreHorizontal className="h-4 w-4 text-white" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => router.push(`/tickets/${ticket.id}`)}>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                router.push(`/tickets/${ticket.id}`)
+                              }
+                            >
                               Ver Detalles
                             </DropdownMenuItem>
                           </DropdownMenuContent>
