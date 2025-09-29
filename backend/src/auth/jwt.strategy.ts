@@ -18,13 +18,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; role: string }): Promise<User> {
-    console.log("🚀 ~ JwtStrategy ~ validate ~ payload:", payload)
+  async validate(payload: { sub: string; role: string; }) {
     const user = await this.userRepository.findOneBy({ id: payload.sub });
     console.log("🚀 ~ JwtStrategy ~ validate ~ user:", user)
     if (!user) {
       throw new UnauthorizedException();
     }
-    return user;
+    // Devolvemos un objeto plano con los datos esenciales, asegurando que el rol del token es el que se usa.
+    // Esto previene problemas si el objeto 'user' de la BD no incluyera el rol por alguna razón.
+    return { id: payload.sub, name: user.name, email: user.email, role: user.role };
   }
 }

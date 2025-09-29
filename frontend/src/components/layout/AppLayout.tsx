@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LayoutDashboard, Ticket, LogOut } from "lucide-react"; // Iconos
+import { LayoutDashboard, Ticket, LogOut, LayoutGrid } from "lucide-react"; // Iconos
 import { usePathname } from "next/navigation";
 import Header from "./Header";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ const getTitleForPath = (path: string) => {
   if (path.startsWith("/tickets/new")) return "Crear Nuevo Ticket";
   if (path.startsWith("/tickets/")) return "Detalles del Ticket";
   if (path.startsWith("/tickets")) return "Dashboard de Soporte";
+  if (path.startsWith("/categories")) return "Gestión de Categorías";
   // Añade más rutas aquí si es necesario
   return "Dashboard";
 };
@@ -59,6 +60,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <Ticket className="mr-3 h-5 w-5" />
               Nuevo Ticket
+            </Link>
+            <Link
+              href="/categories"
+              className={cn(
+                "flex items-center p-2 rounded-md hover:bg-gray-700 transition-colors",
+                pathname.startsWith("/categories") ? "bg-gray-700" : ""
+              )}
+            >
+              <LayoutGrid className="mr-3 h-5 w-5" />
+              Categorías
             </Link>
           </nav>
          

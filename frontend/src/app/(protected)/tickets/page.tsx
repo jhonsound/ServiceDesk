@@ -86,7 +86,7 @@ export default function TicketsListPage() {
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody >
                 {tickets.map((ticket) => {
                   const isSlaBreached =
                     ticket.status !== "resolved" &&
