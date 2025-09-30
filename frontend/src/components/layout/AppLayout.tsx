@@ -61,6 +61,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <Ticket className="mr-3 h-5 w-5" />
               Nuevo Ticket
             </Link>
+            
             <Link
               href="/categories"
               className={cn(
