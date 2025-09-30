@@ -1,18 +1,18 @@
 # Diagrama de Entidad-Relación de la Base de Datos
 
-Este documento contiene el diagrama de la base de datos para ServiceDesk Pro, generado en formato Mermaid a partir de las entidades de TypeORM del backend.
+Este documento contiene el diagrama de la base de datos para ServiceDesk Pro, generado en formato Mermaid. El diagrama refleja la estructura de las entidades de TypeORM definidas en el backend.
 
 ```mermaid
 erDiagram
     User {
-        string id PK
+        UUID id PK
         string name
         string email
-        string role
+        UserRole role
     }
 
     Category {
-        string id PK
+        UUID id PK
         string name
         string description
         int sla_first_response_hours
@@ -20,45 +20,54 @@ erDiagram
     }
 
     CustomField {
-        string id PK
+        UUID id PK
         string label
-        string type
+        FieldType type
         bool is_required
-        string category_id FK
     }
 
     Ticket {
-        string id PK
+        UUID id PK
         string title
         string description
-        string status
-        datetime created_at
-        datetime sla_resolution_target
-        string requester_id FK
-        string category_id FK
+        TicketStatus status
+        int version
+        timestamp created_at
+        timestamp sla_first_response_target
+        timestamp sla_resolution_target
+        string category_name_snapshot
     }
 
     TicketHistory {
-        string id PK
-        string action
+        UUID id PK
+        ActionType action
+        string old_value
+        string new_value
         string comment
-        datetime created_at
-        string ticket_id FK
-        string user_id FK
+        timestamp created_at
     }
 
     TicketCustomFieldValue {
-        string id PK
+        UUID id PK
         string value
-        string ticket_id FK
-        string customField_id FK
     }
 
-    User ||--o{ Ticket : "requests"
-    Category ||--o{ Ticket : "contains"
-    Category ||--o{ CustomField : "defines"
-    Ticket ||--o{ TicketHistory : "has"
-    User ||--o{ TicketHistory : "performs"
-    Ticket ||--o{ TicketCustomFieldValue : "has"
-    CustomField ||--o{ TicketCustomFieldValue : "is"
+    User ||--o{ Ticket : requester
+    User ||--o{ TicketHistory : user
+
+    Category ||--o{ Ticket : category
+    Category ||--|{ CustomField : "has"
+
+    Ticket ||--|{ TicketHistory : "has"
+    Ticket ||--|{ TicketCustomFieldValue : "has value for"
+
+    CustomField ||--o{ TicketCustomFieldValue : customField
+
 ```
+
+### Tipos de Enumeración (Enums)
+
+- **UserRole:** `requester`, `agent`, `manager`
+- **FieldType:** `text`, `textarea`, `select`
+- **TicketStatus:** `open`, `in_progress`, `resolved`, `closed`
+- **ActionType:** `ticket_created`, `status_change`, `comment_added`
