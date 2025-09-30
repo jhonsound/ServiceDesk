@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getStatusVariant } from "@/lib/utils";
-import { Ticket } from "@/services/api";
+import { Ticket } from "@/types";
 
 const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
   const router = useRouter();

@@ -1,7 +1,7 @@
 export enum UserRole {
-  Requester = 'requester',
-  Agent = 'agent',
-  Manager = 'manager',
+  Requester = "requester",
+  Agent = "agent",
+  Manager = "manager",
 }
 
 export interface User {
@@ -51,8 +51,6 @@ export interface LoginPayload {
   password: string;
 }
 
-import { User, UserRole } from "@/types/user";
-
 export interface RegisterPayload extends LoginPayload {
   name: string;
   role: UserRole;
@@ -67,7 +65,6 @@ export interface CreateTicketPayload {
     value: string;
   }[];
 }
-
 
 export interface TicketHistory {
   id: string;
@@ -93,10 +90,10 @@ export interface Ticket {
 }
 
 export enum TicketStatus {
-  OPEN = 'open',
-  IN_PROGRESS = 'in_progress',
-  RESOLVED = 'resolved',
-  CLOSED = 'closed',
+  OPEN = "open",
+  IN_PROGRESS = "in_progress",
+  RESOLVED = "resolved",
+  CLOSED = "closed",
 }
 
 export interface UpdateTicketStatusPayload {

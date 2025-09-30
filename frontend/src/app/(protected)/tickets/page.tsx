@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getTickets, Ticket } from "@/services/api";
+import { getTickets } from "@/services/api";
 import Dashboard from "@/components/dashboard/Dashboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import TableTicket from "@/components/tickests/TableTicket";
+import { Ticket } from "@/types";
 
 export default function TicketsListPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);

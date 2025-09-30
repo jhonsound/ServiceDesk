@@ -1,8 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -24,7 +36,7 @@ export default function LoginPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("An unknown error occurred during login.");
+        setError('An unknown error occurred during login.');
       }
     } finally {
       setIsLoading(false);
@@ -32,47 +44,58 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Iniciar Sesión</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-
-          <div>
-            <label htmlFor="email" className="block mb-2 font-semibold text-gray-700">Correo Electrónico</label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+    <div className="min-h-screen flex items-center justify-center bg-[#1a1a1a] p-4">
+      <Card className="w-full max-w-md bg-[#242424] border-gray-700">
+        <CardHeader className="text-center">
+          <div className="flex justify-center items-center mb-4">
+            <LogIn className="h-8 w-8 mr-2" />
+            <h1 className="text-3xl font-bold">ServiceDesk Pro</h1>
           </div>
-
-          <div>
-            <label htmlFor="password" className="block mb-2 font-semibold text-gray-700">Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <button type="submit" disabled={isLoading} className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors">
-            {isLoading ? 'Ingresando...' : 'Ingresar'}
-          </button>
-
-          {error && <p className="text-red-500 text-sm text-center pt-2">{error}</p>}
-        </form>
-        <p className="text-center text-sm text-gray-600 mt-6">
-          ¿No tienes una cuenta? <Link href="/register" className="font-semibold text-blue-600 hover:underline">Regístrate</Link>
-        </p>
-      </div>
+          <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
+          <CardDescription>Ingresa tus credenciales para acceder a tu cuenta.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Correo Electrónico</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="tu@email.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+              />
+            </div>
+            {error && <p className="text-sm text-destructive text-center">{error}</p>}
+            <Button type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? 'Ingresando...' : 'Ingresar'}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground">
+            ¿No tienes una cuenta?{' '} 
+            <Link href="/register" className="font-semibold text-primary hover:underline">
+              Regístrate
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

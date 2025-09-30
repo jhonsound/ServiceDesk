@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getKpis, KpiData } from "../../services/api";
-import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { getKpis } from "../../services/api";
 import KpiCard from "./KpiCard";
+import { KpiData } from "@/types";
 
-
-export default function Dashboard({ setIsLoadingCard }: { setIsLoadingCard: (loading: boolean) => void }) {
+export default function Dashboard({
+  setIsLoadingCard,
+}: {
+  setIsLoadingCard: (loading: boolean) => void;
+}) {
   const [kpiData, setKpiData] = useState<KpiData | null>(null);
 
   const [error, setError] = useState<string | null>(null);

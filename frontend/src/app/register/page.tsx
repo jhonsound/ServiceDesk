@@ -1,36 +1,65 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { UserPlus } from 'lucide-react';
 import { UserRole } from '@/types';
 
 export default function RegisterPage() {
   const { register } = useAuth();
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: UserRole.Requester });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: UserRole.Requester,
+  });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleRoleChange = (value: string) => {
+    setFormData({ ...formData, role: value as UserRole });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsLoading(true);
+
     if (formData.password.length < 8) {
-        setError('La contraseña debe tener al menos 8 caracteres.');
-        setIsLoading(false);
-        return;
+      setError('La contraseña debe tener al menos 8 caracteres.');
+      return;
     }
+    
+    setIsLoading(true);
     try {
       await register(formData);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("An unknown error occurred during registration.");
+        setError('An unknown error occurred during registration.');
       }
     } finally {
       setIsLoading(false);
@@ -38,79 +67,93 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Crear una Cuenta</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
-          <div>
-            <label htmlFor="name" className="block mb-2 font-semibold text-gray-700">Nombre Completo</label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+    <div className="min-h-screen flex items-center justify-center bg-[#1a1a1a] p-4">
+      <Card className="w-full max-w-md bg-[#242424] border-gray-700">
+        <CardHeader className="text-center">
+           <div className="flex justify-center items-center mb-4">
+            <UserPlus className="h-8 w-8 mr-2" />
+            <h1 className="text-3xl font-bold">ServiceDesk Pro</h1>
           </div>
-
-          <div>
-            <label htmlFor="email" className="block mb-2 font-semibold text-gray-700">Correo Electrónico</label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block mb-2 font-semibold text-gray-700">Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="role" className="block mb-2 font-semibold text-gray-700">Rol</label>
-            <select
-              name="role"
-              id="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {/* Generamos las opciones a partir del enum para que siempre estén sincronizadas */}
-              {Object.values(UserRole).map(role => (
-                  <option key={role} value={role}>
-                      {role.charAt(0).toUpperCase() + role.slice(1)} {/* Pone la primera letra en mayúscula */}
-                  </option>
-              ))}
-            </select>
-          </div>
-
-          <button type="submit" disabled={isLoading} className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors">
-            {isLoading ? 'Registrando...' : 'Registrar'}
-          </button>
-          
-          {error && <p className="text-red-500 text-sm text-center pt-2">{error}</p>}
-        </form>
-        <p className="text-center text-sm text-gray-600 mt-6">
-          ¿Ya tienes una cuenta? <Link href="/login" className="font-semibold text-blue-600 hover:underline">Inicia Sesión</Link>
-        </p>
-      </div>
+          <CardTitle className="text-2xl">Crear una Cuenta</CardTitle>
+          <CardDescription>Completa el formulario para registrarte.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nombre Completo</Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="John Doe"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Correo Electrónico</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="tu@email.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="8+ caracteres"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Rol</Label>
+              <Select
+                name="role"
+                value={formData.role}
+                onValueChange={handleRoleChange}
+                required
+                disabled={isLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(UserRole).map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {role.charAt(0).toUpperCase() + role.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {error && <p className="text-sm text-destructive text-center">{error}</p>}
+            <Button type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? 'Registrando...' : 'Crear Cuenta'}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground">
+            ¿Ya tienes una cuenta?{' '}
+            <Link href="/login" className="font-semibold text-primary hover:underline">
+              Inicia Sesión
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

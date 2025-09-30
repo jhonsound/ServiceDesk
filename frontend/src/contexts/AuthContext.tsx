@@ -3,13 +3,10 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  AuthResponse,
   loginUser,
   registerUser,
-  LoginPayload,
-  RegisterPayload,
 } from '../services/api';
-import { User } from '@/types';
+import { AuthResponse, LoginPayload, RegisterPayload, User } from '@/types';
 
 interface AuthContextType {
   user: User | null;
