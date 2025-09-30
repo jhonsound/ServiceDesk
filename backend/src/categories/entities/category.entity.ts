@@ -10,6 +10,9 @@ export class Category {
   @Column({ unique: true })
   name: string;
 
+  @Column({ default: '' })
+  description: string;
+
   @Column()
   sla_first_response_hours: number;
 

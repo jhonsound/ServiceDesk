@@ -1,3 +1,4 @@
+
 // Definimos los tipos de datos que esperamos de la API
 // Esto nos da autocompletado y previene errores.
 export interface CustomField {
@@ -10,7 +11,22 @@ export interface CustomField {
 export interface Category {
   id: string;
   name: string;
+  description: string;
+  sla_first_response_hours: number;
+  sla_resolution_hours: number;
   customFields: CustomField[];
+}
+
+export interface CreateCategoryPayload {
+  name: string;
+  description: string;
+  sla_first_response_hours: number;
+  sla_resolution_hours: number;
+  customFields: {
+    label: string;
+    type: "text" | "textarea" | "select";
+    is_required: boolean;
+  }[];
 }
 
 export interface AuthResponse {
@@ -71,19 +87,6 @@ export enum TicketStatus {
   CLOSED = 'closed',
 }
 
-export interface Ticket {
-  id: string;
-  title: string;
-  description: string;
-  status: TicketStatus; // <-- ACTUALIZA ESTA LÍNEA para que use el enum
-  created_at: string;
-  sla_resolution_target: string;
-  version: number;
-  requester: User;
-  category: Category;
-  history: TicketHistory[];
-}
-
 export interface UpdateTicketStatusPayload {
   newStatus: "open" | "in_progress" | "resolved" | "closed";
   version: number;
@@ -142,16 +145,41 @@ export const loginUser = async (payload: any): Promise<AuthResponse> => {
   return response.json();
 };
 
+
 /**
  * Obtiene todas las categorías desde el backend.
  */
 export const getCategories = async (): Promise<Category[]> => {
-  const response = await fetch(`${API_BASE_URL}/categories`);
+  const response = await fetch(`${API_BASE_URL}/categories`, {
+    headers: getAuthHeaders(),
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch categories");
   }
   return response.json();
 };
+
+/**
+ * Crea una nueva categoría.
+ * @param categoryData - Los datos de la categoría a crear.
+ */
+export const createCategory = async (
+  categoryData: CreateCategoryPayload
+): Promise<Category> => {
+  const response = await fetch(`${API_BASE_URL}/categories`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(categoryData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to create category");
+  }
+
+  return response.json();
+};
+
 
 export const getTickets = async (): Promise<Ticket[]> => {
   const response = await fetch(`${API_BASE_URL}/tickets`, {

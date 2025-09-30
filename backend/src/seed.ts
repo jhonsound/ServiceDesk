@@ -74,6 +74,7 @@ async function bootstrap() {
     const categories = await categoryRepository.save([
       {
         name: 'Acceso a Repositorio GitHub',
+        description: 'Solicitud para dar acceso de lectura/escritura a un repositorio de código en GitHub.',
         sla_first_response_hours: 2,
         sla_resolution_hours: 8,
         customFields: [
@@ -86,6 +87,7 @@ async function bootstrap() {
       },
       {
         name: 'Falla en Pipeline de CI/CD',
+        description: 'Reporte de errores o fallas en los pipelines de integración y despliegue continuo.',
         sla_first_response_hours: 1,
         sla_resolution_hours: 12,
         customFields: [
@@ -103,6 +105,7 @@ async function bootstrap() {
       },
       {
         name: 'Alta de Cuenta (SaaS)',
+        description: 'Creación de nuevas cuentas de usuario en plataformas de software como servicio (SaaS) de terceros.',
         sla_first_response_hours: 8,
         sla_resolution_hours: 48,
         customFields: [
@@ -116,6 +119,7 @@ async function bootstrap() {
       },
       {
         name: 'Problema con Entorno de Desarrollo',
+        description: 'Reporte de problemas técnicos con los entornos de desarrollo personales o compartidos.',
         sla_first_response_hours: 4,
         sla_resolution_hours: 24,
         customFields: [

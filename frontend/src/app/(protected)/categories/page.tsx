@@ -1,0 +1,59 @@
+
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { getCategories } from "@/services/api";
+import type { Category } from "@/services/api";
+import { CategoryHeader } from "@/components/categories/CategoryHeader";
+import { CategoryCardView } from "@/components/categories/CategoryCardView";
+import { CategoryTableView } from "@/components/categories/CategoryTableView";
+
+export default function CategoriesPage() {
+  const { user } = useAuth();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await getCategories();
+      setCategories(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch categories");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.role === "manager") {
+      fetchCategories();
+    }
+  }, [user]);
+
+  if (user?.role !== "manager") {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-red-500">Access Denied. Only managers can view this page.</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return <div>Loading categories...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
+
+  return (
+    <div className="p-4 md:p-8">
+      <CategoryHeader onCategoryCreated={fetchCategories} />
+      <CategoryCardView categories={categories} />
+      <CategoryTableView categories={categories} />
+    </div>
+  );
+}
