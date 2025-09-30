@@ -11,6 +11,35 @@ export interface User {
   email?: string;
 }
 
+export interface MainFieldsProps {
+  name: string;
+  description: string;
+  slaFirstResponse: number;
+  slaResolution: number;
+  setName: (name: string) => void;
+  setDescription: (description: string) => void;
+  setSlaFirstResponse: (slaFirstResponse: number) => void;
+  setSlaResolution: (slaResolution: number) => void;
+}
+
+export interface CustomFieldsProps {
+  customFields: {
+    label: string;
+    type: "text" | "textarea" | "select";
+    is_required: boolean;
+  }[];
+  handleAddCustomField: () => void;
+  handleRemoveCustomField: (index: number) => void;
+  handleCustomFieldChange: (
+    index: number,
+    updates: Partial<{
+      label: string;
+      type: "text" | "textarea" | "select";
+      is_required: boolean;
+    }>
+  ) => void;
+}
+
 // Definimos los tipos de datos que esperamos de la API
 // Esto nos da autocompletado y previene errores.
 export interface CustomField {
@@ -39,6 +68,18 @@ export interface CreateCategoryPayload {
     type: "text" | "textarea" | "select";
     is_required: boolean;
   }[];
+}
+
+export type CustomFieldState = Omit<
+  CreateCategoryPayload["customFields"][0],
+  "is_required"
+> & {
+  is_required: boolean;
+};
+
+export interface CreateCategoryFormProps {
+  onSuccess: () => void; // Callback para ejecutar en caso de éxito
+  setOpen: (open: boolean) => void; // Para cerrar el diálogo
 }
 
 export interface AuthResponse {

@@ -21,3 +21,12 @@ export const getStatusVariant = (status: TicketStatus) => {
       return 'default';
   }
 };
+
+export const getTitleForPath = (path: string) => {
+  if (path.startsWith("/tickets/new")) return "Crear Nuevo Ticket";
+  if (path.startsWith("/tickets/")) return "Detalles del Ticket";
+  if (path.startsWith("/tickets")) return "Dashboard de Soporte";
+  if (path.startsWith("/categories")) return "Gestión de Categorías";
+  if (path.startsWith("/dashboard")) return "Analytics de Soporte";
+  return "Dashboard";
+};
