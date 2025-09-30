@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getCategories } from "@/services/api";
-import type { Category } from "@/services/api";
 import { CategoryHeader } from "@/components/categories/CategoryHeader";
 import { CategoryCardView } from "@/components/categories/CategoryCardView";
 import { CategoryTableView } from "@/components/categories/CategoryTableView";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { Category } from "@/types";
 
 export default function CategoriesPage() {
   const { user } = useAuth();

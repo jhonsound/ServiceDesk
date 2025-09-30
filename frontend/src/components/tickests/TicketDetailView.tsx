@@ -6,9 +6,6 @@ import {
   getTicketById,
   updateTicketStatus,
   addCommentToTicket,
-  Ticket,
-  TicketHistory,
-  TicketStatus,
 } from "@/services/api";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -17,8 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { getStatusVariant } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { UserRole } from "@/types";
-import { Spinner } from '@/components/ui/shadcn-io/spinner';
+import { Ticket, TicketHistory, TicketStatus, UserRole } from "@/types";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
 
 // --- Sub-componente para renderizar el historial ---
 function TicketTimeline({ history }: { history: TicketHistory[] }) {
@@ -85,7 +82,7 @@ export default function TicketDetailView() {
         setIsLoading(true);
         try {
           const data = await getTicketById(id);
-          console.log("🚀 ~ fetchTicket ~ data:", data)
+          console.log("🚀 ~ fetchTicket ~ data:", data);
           setTicket(data);
         } catch {
           setError("No se pudo cargar el ticket.");
@@ -107,7 +104,10 @@ export default function TicketDetailView() {
       });
 
       const freshTicketData = await getTicketById(ticket!.id);
-      console.log("🚀 ~ handleStatusChange ~ freshTicketData:", freshTicketData)
+      console.log(
+        "🚀 ~ handleStatusChange ~ freshTicketData:",
+        freshTicketData
+      );
 
       setTicket(freshTicketData);
     } catch (err) {
@@ -139,7 +139,6 @@ export default function TicketDetailView() {
       });
 
       setNewComment("");
-
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

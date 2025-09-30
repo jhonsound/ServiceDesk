@@ -1,16 +1,14 @@
 "use client"; // Directiva para indicar que es un Componente de Cliente
 
 import { useEffect, useState } from "react";
-import {
-  getCategories,
-  createTicket,
-  Category,
-  CreateTicketPayload,
-} from "../../services/api";
+import { getCategories, createTicket } from "../../services/api";
+import { Category, CreateTicketPayload } from "@/types";
 
 export default function CreateTicketForm() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -23,7 +21,9 @@ export default function CreateTicketForm() {
         setCategories(data);
         setError(null);
       } catch {
-        setError("No se pudieron cargar las categorías. Inténtalo de nuevo más tarde.");
+        setError(
+          "No se pudieron cargar las categorías. Inténtalo de nuevo más tarde."
+        );
       } finally {
         setIsLoading(false);
       }
@@ -87,7 +87,9 @@ export default function CreateTicketForm() {
             Crear Nuevo Ticket de Soporte
           </h2>
           {error && (
-            <div className="p-3 bg-red-100 text-red-700 rounded-md">{error}</div>
+            <div className="p-3 bg-red-100 text-red-700 rounded-md">
+              {error}
+            </div>
           )}
           {successMessage && (
             <div className="p-3 bg-green-100 text-green-700 rounded-md">
@@ -113,7 +115,10 @@ export default function CreateTicketForm() {
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="description" className="mb-2 font-semibold text-white">
+            <label
+              htmlFor="description"
+              className="mb-2 font-semibold text-white"
+            >
               Descripción
             </label>
             <textarea
@@ -156,9 +161,14 @@ export default function CreateTicketForm() {
               </h3>
               {selectedCategory.customFields.map((field) => (
                 <div key={field.id} className="flex flex-col">
-                  <label htmlFor={`custom_${field.id}`} className="mb-2 text-white">
+                  <label
+                    htmlFor={`custom_${field.id}`}
+                    className="mb-2 text-white"
+                  >
                     {field.label}{" "}
-                    {field.is_required && <span className="text-red-500">*</span>}
+                    {field.is_required && (
+                      <span className="text-red-500">*</span>
+                    )}
                   </label>
                   <input
                     type="text"

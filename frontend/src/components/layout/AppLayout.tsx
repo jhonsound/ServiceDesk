@@ -8,25 +8,7 @@ import { UserRole } from "@/types";
 import Header from "./Header";
 
 // Icons
-import {
-  LayoutDashboard,
-  Ticket,
-  LayoutGrid,
-  BarChart2,
-  LogOut,
-} from "lucide-react";
-
-// UI Components
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { LayoutDashboard, Ticket, LayoutGrid } from "lucide-react";
 
 // Helper para obtener el título basado en la ruta
 const getTitleForPath = (path: string) => {
@@ -88,14 +70,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       icon: <Ticket className="mr-3 h-5 w-5" />,
       allowedRoles: [UserRole.Requester, UserRole.Agent, UserRole.Manager],
       matchType: "exact",
-    },/* 
+    } /* 
     {
       href: "/dashboard",
       label: "Analytics",
       icon: <BarChart2 className="mr-3 h-5 w-5" />,
       allowedRoles: [UserRole.Agent, UserRole.Manager],
       matchType: "exact",
-    }, */
+    }, */,
     {
       href: "/categories",
       label: "Categorías",

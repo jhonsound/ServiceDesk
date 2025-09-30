@@ -1,7 +1,6 @@
 
 "use client";
 
-import type { Category } from "@/services/api";
 import {
   Table,
   TableBody,
@@ -10,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Category } from "@/types";
 
 interface CategoryTableViewProps {
   categories: Category[];

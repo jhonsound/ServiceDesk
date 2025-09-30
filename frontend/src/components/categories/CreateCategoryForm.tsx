@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createCategory } from "@/services/api";
-import type { CreateCategoryPayload } from "@/services/api";
+import { CreateCategoryPayload } from "@/types";
 
 // Definimos el tipo para un campo personalizado en el estado del formulario
 type CustomFieldState = Omit<

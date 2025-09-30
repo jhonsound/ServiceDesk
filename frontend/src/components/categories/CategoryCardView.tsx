@@ -1,7 +1,8 @@
 
 "use client";
 
-import type { Category } from "@/services/api";
+import { Category } from "@/types";
+
 
 interface CategoryCardViewProps {
   categories: Category[];
