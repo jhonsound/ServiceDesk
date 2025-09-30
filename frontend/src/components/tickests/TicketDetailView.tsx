@@ -8,7 +8,6 @@ import {
   addCommentToTicket,
   Ticket,
   TicketHistory,
-  UserRole,
   TicketStatus,
 } from "@/services/api";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { getStatusVariant } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { UserRole } from "@/types/user";
+import { Spinner } from '@/components/ui/shadcn-io/spinner';
 
 // --- Sub-componente para renderizar el historial ---
 function TicketTimeline({ history }: { history: TicketHistory[] }) {
@@ -74,7 +75,7 @@ export default function TicketDetailView() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUserRole, setCurrentUserRole] = useState<UserRole>(
-    UserRole.AGENT
+    UserRole.Agent
   );
   const [newComment, setNewComment] = useState("");
 
@@ -154,8 +155,8 @@ export default function TicketDetailView() {
     if (!ticket) return [];
     const actions = [];
     if (
-      currentUserRole === UserRole.AGENT ||
-      currentUserRole === UserRole.MANAGER
+      currentUserRole === UserRole.Agent ||
+      currentUserRole === UserRole.Manager
     ) {
       if (ticket.status === TicketStatus.OPEN)
         actions.push({
@@ -169,8 +170,8 @@ export default function TicketDetailView() {
         });
     }
     if (
-      currentUserRole === UserRole.REQUESTER ||
-      currentUserRole === UserRole.MANAGER
+      currentUserRole === UserRole.Requester ||
+      currentUserRole === UserRole.Manager
     ) {
       if (ticket.status === TicketStatus.RESOLVED)
         actions.push({
@@ -185,8 +186,8 @@ export default function TicketDetailView() {
 
   if (isLoading && !ticket) {
     return (
-      <div className="flex items-center justify-center h-full">
-        Cargando detalles del ticket...
+      <div className="flex items-center justify-center">
+        <Spinner className="text-gray-500" variant={"infinite"} size={64} />
       </div>
     );
   }

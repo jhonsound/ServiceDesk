@@ -39,6 +39,8 @@ export interface LoginPayload {
   password: string;
 }
 
+import { User, UserRole } from "@/types/user";
+
 export interface RegisterPayload extends LoginPayload {
   name: string;
   role: UserRole;
@@ -54,12 +56,6 @@ export interface CreateTicketPayload {
   }[];
 }
 
-export interface User {
-  id: string;
-  name: string;
-  role: UserRole;
-  email?: string;
-}
 
 export interface TicketHistory {
   id: string;
@@ -84,12 +80,6 @@ export interface Ticket {
   history: TicketHistory[];
 }
 
-export enum UserRole {
-  REQUESTER = "requester",
-  AGENT = "agent",
-  MANAGER = "manager",
-}
-
 export enum TicketStatus {
   OPEN = 'open',
   IN_PROGRESS = 'in_progress',
@@ -109,7 +99,7 @@ export interface KpiData {
 }
 
 // URL base de tu API de NestJS
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"; // Asegúrate de que el puerto sea correcto
+const API_BASE_URL = /* process.env.NEXT_PUBLIC_API_URL || */ "http://localhost:5000"; // Asegúrate de que el puerto sea correcto
 
 // --- NUEVA FUNCIÓN AUXILIAR ---
 // Esta función nos ayudará a obtener las cabeceras de autenticación

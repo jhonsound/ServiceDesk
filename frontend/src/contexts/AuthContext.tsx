@@ -6,10 +6,10 @@ import {
   AuthResponse,
   loginUser,
   registerUser,
-  User,
   LoginPayload,
   RegisterPayload,
 } from '../services/api';
+import { User } from '@/types/user';
 
 interface AuthContextType {
   user: User | null;

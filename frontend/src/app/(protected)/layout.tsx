@@ -1,22 +1,30 @@
-'use client';
+"use client";
 
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import AppLayout from '@/components/layout/AppLayout';
-
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import AppLayout from "@/components/layout/AppLayout";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
+export default function ProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [user, isLoading, router]);
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
+    return (
+      <div className="flex items-center justify-center">
+        <Spinner className="text-gray-500" variant={"infinite"} size={64} />
+      </div>
+    );
   }
 
   if (!user) {

@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { UserRole } from '../../services/api'; // La importación no cambia
 import Link from 'next/link';
+import { UserRole } from '@/types/user';
 
 export default function RegisterPage() {
   const { register } = useAuth();
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: UserRole.REQUESTER });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: UserRole.Requester });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
