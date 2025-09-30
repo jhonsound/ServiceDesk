@@ -237,9 +237,9 @@ export default function TicketDetailView() {
           <Card className="bg-[#242424] border-none shadow-2xl">
             <CardHeader>
               {isSlaBreached && (
-                <div className="p-4 mb-4 bg-red-100 border-l-4 border-red-500 text-red-700">
-                  <p className="font-bold">Atención</p>
-                  <p>El SLA de resolución ha sido incumplido.</p>
+                <div className="p-4 mb-4 bg-red-900/50 border-l-4 border-red-500 text-red-300 rounded-r-lg">
+                  <p className="font-bold text-red-200">Atención: SLA Incumplido</p>
+                  <p>Este ticket ha superado el tiempo objetivo de resolución.</p>
                 </div>
               )}
               <CardTitle className="text-3xl text-white">

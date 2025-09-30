@@ -65,11 +65,10 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
               </TableCell>
               <TableCell>
                 {isSlaBreached && (
-                  <span className="flex items-center text-red-500 font-semibold">
-                    <AlertTriangle className="h-4 w-4 mr-1.5" />{" "}
-                    {/* Usamos un icono para que sea más claro */}
-                    Vencido
-                  </span>
+                  <Badge variant={"destructive"} className="whitespace-nowrap">
+                    <AlertTriangle className="h-4 w-4 mr-1.5" />
+                    SLA Vencido
+                  </Badge>
                 )}
               </TableCell>
               <TableCell className="text-right">
