@@ -1,39 +1,64 @@
+# Diagrama de Entidad-Relación de la Base de Datos
+
+Este documento contiene el diagrama de la base de datos para ServiceDesk Pro, generado en formato Mermaid a partir de las entidades de TypeORM del backend.
+
+```mermaid
 erDiagram
     User {
-        UUID id PK
+        string id PK
         string name
         string email
-        enum role
+        string role
     }
+
     Category {
-        UUID id PK
+        string id PK
         string name
+        string description
         int sla_first_response_hours
         int sla_resolution_hours
     }
+
     CustomField {
-        UUID id PK
+        string id PK
         string label
-        enum type
+        string type
         bool is_required
-    }
-    Ticket {
-        UUID id PK
-        string title
-        text description
-        enum status
-        timestamp created_at
-        timestamp sla_first_response_target
-        timestamp sla_resolution_target
-        string category_name_snapshot
-    }
-    TicketCustomFieldValue {
-        UUID id PK
-        text value
+        string category_id FK
     }
 
-    User ||--o{ Ticket : "creates"}
-    Category ||--o{ Ticket : "classifies"}
-    Category ||--|{ CustomField : "defines"}
-    Ticket ||--|{ TicketCustomFieldValue : "has"}
-    CustomField ||--o{ TicketCustomFieldValue : "is instance of"}
+    Ticket {
+        string id PK
+        string title
+        string description
+        string status
+        datetime created_at
+        datetime sla_resolution_target
+        string requester_id FK
+        string category_id FK
+    }
+
+    TicketHistory {
+        string id PK
+        string action
+        string comment
+        datetime created_at
+        string ticket_id FK
+        string user_id FK
+    }
+
+    TicketCustomFieldValue {
+        string id PK
+        string value
+        string ticket_id FK
+        string customField_id FK
+    }
+
+    User ||--o{ Ticket : "requests"
+    Category ||--o{ Ticket : "contains"
+    Category ||--o{ CustomField : "defines"
+    Ticket ||--o{ TicketHistory : "has"
+    User ||--o{ TicketHistory : "performs"
+    Ticket ||--o{ TicketCustomFieldValue : "has"
+    CustomField ||--o{ TicketCustomFieldValue : "is"
+```
