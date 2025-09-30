@@ -20,8 +20,12 @@ export default function CategoriesPage() {
       setLoading(true);
       const data = await getCategories();
       setCategories(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch categories");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred while fetching categories.");
+      }
     } finally {
       setLoading(false);
     }

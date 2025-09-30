@@ -6,7 +6,6 @@ import {
   createTicket,
   Category,
   CreateTicketPayload,
-  CustomField,
 } from "../../services/api";
 
 export default function CreateTicketForm() {
@@ -23,7 +22,7 @@ export default function CreateTicketForm() {
         const data = await getCategories();
         setCategories(data);
         setError(null);
-      } catch (err) {
+      } catch {
         setError("No se pudieron cargar las categorías. Inténtalo de nuevo más tarde.");
       } finally {
         setIsLoading(false);
@@ -66,8 +65,12 @@ export default function CreateTicketForm() {
       setSuccessMessage("¡Ticket creado exitosamente!");
       e.currentTarget.reset();
       setSelectedCategory(null);
-    } catch (err: any) {
-      setError(err.message || "Ocurrió un error al crear el ticket.");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Ocurrió un error al crear el ticket.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -149,7 +152,7 @@ export default function CreateTicketForm() {
           {selectedCategory && selectedCategory.customFields.length > 0 && (
             <div className="p-4 border-t border-gray-700 space-y-4">
               <h3 className="font-semibold text-white">
-                Información Adicional para "{selectedCategory.name}"
+                Información Adicional para &quot;{selectedCategory.name}&quot;
               </h3>
               {selectedCategory.customFields.map((field) => (
                 <div key={field.id} className="flex flex-col">

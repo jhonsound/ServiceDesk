@@ -24,7 +24,7 @@ export default function Dashboard() {
             try {
                 const data = await getKpis();
                 setKpiData(data);
-            } catch (err) {
+            } catch {
                 setError('No se pudo cargar la información del dashboard.');
             } finally {
                 setIsLoading(false);
