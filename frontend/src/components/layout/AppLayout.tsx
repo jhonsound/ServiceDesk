@@ -1,19 +1,7 @@
 "use client";
-
-import { useAuth } from "@/contexts/AuthContext";
 import React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LayoutDashboard, Ticket, LogOut, LayoutGrid } from "lucide-react"; // Iconos
+import { LayoutDashboard, Ticket, LayoutGrid } from "lucide-react"; // Iconos
 import { usePathname } from "next/navigation";
 import Header from "./Header";
 import { cn } from "@/lib/utils";
@@ -29,9 +17,7 @@ const getTitleForPath = (path: string) => {
 };
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth();
   const pathname = usePathname();
-  console.log("🚀 ~ AppLayout ~ pathname:", pathname);
   const title = getTitleForPath(pathname);
 
   return (

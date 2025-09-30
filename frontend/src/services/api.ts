@@ -34,6 +34,16 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface RegisterPayload extends LoginPayload {
+  name: string;
+  role: UserRole;
+}
+
 export interface CreateTicketPayload {
   title: string;
   description: string;
@@ -99,7 +109,8 @@ export interface KpiData {
 }
 
 // URL base de tu API de NestJS
-const API_BASE_URL = "http://localhost:5000"; // Asegúrate de que el puerto sea correcto
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"; // Asegúrate de que el puerto sea correcto
+console.log("🚀 ~ API_BASE_URL:", API_BASE_URL)
 
 // --- NUEVA FUNCIÓN AUXILIAR ---
 // Esta función nos ayudará a obtener las cabeceras de autenticación
@@ -115,7 +126,7 @@ const getAuthHeaders = () => {
  * Registra un nuevo usuario.
  * El payload debe coincidir con el CreateUserDto del backend.
  */
-export const registerUser = async (payload: any): Promise<User> => {
+export const registerUser = async (payload: RegisterPayload): Promise<User> => {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -132,7 +143,7 @@ export const registerUser = async (payload: any): Promise<User> => {
  * Inicia sesión de un usuario.
  * El payload debe coincidir con el LoginDto del backend.
  */
-export const loginUser = async (payload: any): Promise<AuthResponse> => {
+export const loginUser = async (payload: LoginPayload): Promise<AuthResponse> => {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -242,7 +253,7 @@ export const updateTicketStatus = async (
  */
 export const createTicket = async (
   ticketData: CreateTicketPayload
-): Promise<any> => {
+): Promise<Ticket> => {
   const response = await fetch(`${API_BASE_URL}/tickets`, {
     method: "POST",
     headers: getAuthHeaders(), // <-- AÑADIMOS LAS CABECERAS

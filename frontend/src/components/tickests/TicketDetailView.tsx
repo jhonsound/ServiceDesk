@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
   getTicketById,
   updateTicketStatus,
@@ -68,7 +68,6 @@ function TicketTimeline({ history }: { history: TicketHistory[] }) {
 // --- Componente Principal ---
 export default function TicketDetailView() {
   const params = useParams();
-  const router = useRouter();
   const { id } = params;
 
   const [ticket, setTicket] = useState<Ticket | null>(null);
@@ -87,7 +86,7 @@ export default function TicketDetailView() {
           const data = await getTicketById(id);
           console.log("🚀 ~ fetchTicket ~ data:", data)
           setTicket(data);
-        } catch (err) {
+        } catch {
           setError("No se pudo cargar el ticket.");
         } finally {
           setIsLoading(false);
@@ -101,20 +100,21 @@ export default function TicketDetailView() {
     setIsLoading(true);
     setError(null);
     try {
-      // 1. Capturamos el ticket actualizado que devuelve la API
-      const updatedTicketData  = await updateTicketStatus(ticket!.id, {
+      await updateTicketStatus(ticket!.id, {
         newStatus,
         version: ticket!.version,
       });
 
-    // PASO 2: Volver a pedir el ticket completo desde la fuente de verdad.
       const freshTicketData = await getTicketById(ticket!.id);
       console.log("🚀 ~ handleStatusChange ~ freshTicketData:", freshTicketData)
 
-      // PASO 3: Actualizar la UI con los datos 100% frescos y completos.
       setTicket(freshTicketData);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred while changing status.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -127,10 +127,8 @@ export default function TicketDetailView() {
     setIsLoading(true);
     setError(null);
     try {
-      // 1. Capturamos la nueva entrada del historial que devuelve la API
       const newHistoryEntry = await addCommentToTicket(ticket!.id, newComment);
 
-      // 2. Actualizamos el estado local, añadiendo el nuevo comentario al historial existente
       setTicket((prevTicket) => {
         if (!prevTicket) return null;
         return {
@@ -139,12 +137,14 @@ export default function TicketDetailView() {
         };
       });
 
-      setNewComment(""); // Limpiamos el textarea
+      setNewComment("");
 
-      // 3. Ya no necesitamos router.refresh()
-      // router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred while adding comment.");
+      }
     } finally {
       setIsLoading(false);
     }

@@ -11,10 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, PlusCircle } from "lucide-react";
-import Link from "next/link";
+import { LogOut } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { getStatusVariant } from "@/lib/utils";
 
 // El título del header puede cambiar según la página, así que lo pasamos como prop
 export default function Header({ title }: { title: string }) {
@@ -24,7 +22,7 @@ export default function Header({ title }: { title: string }) {
     <header className="flex items-center justify-between h-16 px-8 py-10 shadow-2xl bg-[#242424] ">
 
       <div className="flex items-center space-x-4 justify-center">
-        <h1 className="text-2xl font-bold text-white">ServiceDesk Pro</h1>
+        <h1 className="text-2xl font-bold text-white">{title}</h1>
         <Badge variant={'default'} style={{fontSize: '0.8rem'}}>
           {user?.role}
         </Badge>

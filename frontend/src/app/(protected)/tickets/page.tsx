@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getTickets, Ticket, TicketStatus } from "@/services/api";
+import { getTickets, Ticket } from "@/services/api";
 import Dashboard from "@/components/dashboard/Dashboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +39,7 @@ export default function TicketsListPage() {
         const data = await getTickets();
         console.log("🚀 ~ fetchTickets ~ data:", data)
         setTickets(data);
-      } catch (err) {
+      } catch {
         setError(
           "No se pudieron cargar los tickets. Por favor, intenta de nuevo."
         );

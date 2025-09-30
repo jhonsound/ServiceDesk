@@ -53,11 +53,14 @@ export function CreateCategoryForm({
 
   const handleCustomFieldChange = (
     index: number,
-    field: keyof CustomFieldState,
-    value: string | boolean
+    updates: Partial<CustomFieldState>
   ) => {
-    const newFields = [...customFields];
-    (newFields[index] as any)[field] = value;
+    const newFields = customFields.map((item, i) => {
+      if (i === index) {
+        return { ...item, ...updates };
+      }
+      return item;
+    });
     setCustomFields(newFields);
   };
 
@@ -78,8 +81,12 @@ export function CreateCategoryForm({
       await createCategory(payload);
       onSuccess(); // Llama al callback (ej: refetch de datos)
       setOpen(false); // Cierra el modal
-    } catch (err: any) {
-      setError(err.message || "Ocurrió un error al crear la categoría.");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Ocurrió un error al crear la categoría.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -166,14 +173,14 @@ export function CreateCategoryForm({
                 placeholder="Label del campo"
                 value={field.label}
                 onChange={(e) =>
-                  handleCustomFieldChange(index, "label", e.target.value)
+                  handleCustomFieldChange(index, { label: e.target.value })
                 }
                 className="col-span-5 bg-gray-800 border-gray-600"
               />
               <Select
                 value={field.type}
                 onValueChange={(value) =>
-                  handleCustomFieldChange(index, "type", value)
+                  handleCustomFieldChange(index, { type: value as "text" | "textarea" | "select" })
                 }
               >
                 <SelectTrigger className="col-span-4 bg-gray-800 border-gray-600">
@@ -190,11 +197,7 @@ export function CreateCategoryForm({
                   type="checkbox"
                   checked={field.is_required}
                   onChange={(e) =>
-                    handleCustomFieldChange(
-                      index,
-                      "is_required",
-                      e.target.checked
-                    )
+                    handleCustomFieldChange(index, { is_required: e.target.checked })
                   }
                 />
                 <Label className="text-sm ml-2 text-gray-300">Req.</Label>
