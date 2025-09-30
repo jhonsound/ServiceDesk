@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { getStatusVariant } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { UserRole } from "@/types/user";
+import { UserRole } from "@/types";
 import { Spinner } from '@/components/ui/shadcn-io/spinner';
 
 // --- Sub-componente para renderizar el historial ---

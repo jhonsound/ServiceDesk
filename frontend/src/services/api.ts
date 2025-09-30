@@ -1,102 +1,16 @@
-
-// Definimos los tipos de datos que esperamos de la API
-// Esto nos da autocompletado y previene errores.
-export interface CustomField {
-  id: string;
-  label: string;
-  type: "text" | "textarea" | "select";
-  is_required: boolean;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  description: string;
-  sla_first_response_hours: number;
-  sla_resolution_hours: number;
-  customFields: CustomField[];
-}
-
-export interface CreateCategoryPayload {
-  name: string;
-  description: string;
-  sla_first_response_hours: number;
-  sla_resolution_hours: number;
-  customFields: {
-    label: string;
-    type: "text" | "textarea" | "select";
-    is_required: boolean;
-  }[];
-}
-
-export interface AuthResponse {
-  access_token: string;
-  user: User;
-}
-
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-import { User, UserRole } from "@/types/user";
-
-export interface RegisterPayload extends LoginPayload {
-  name: string;
-  role: UserRole;
-}
-
-export interface CreateTicketPayload {
-  title: string;
-  description: string;
-  categoryId: string;
-  customFieldValues: {
-    customFieldId: string;
-    value: string;
-  }[];
-}
-
-
-export interface TicketHistory {
-  id: string;
-  action: "ticket_created" | "status_change" | "comment_added";
-  old_value: string | null;
-  new_value: string | null;
-  comment: string | null;
-  created_at: string;
-  user: User;
-}
-
-export interface Ticket {
-  id: string;
-  title: string;
-  description: string;
-  status: TicketStatus;
-  created_at: string;
-  sla_resolution_target: string;
-  version: number;
-  requester: User;
-  category: Category;
-  history: TicketHistory[];
-}
-
-export enum TicketStatus {
-  OPEN = 'open',
-  IN_PROGRESS = 'in_progress',
-  RESOLVED = 'resolved',
-  CLOSED = 'closed',
-}
-
-export interface UpdateTicketStatusPayload {
-  newStatus: "open" | "in_progress" | "resolved" | "closed";
-  version: number;
-}
-
-export interface KpiData {
-  openTickets: number;
-  ticketsInLast7Days: number;
-  slaCompliancePercentage: number;
-}
+import {
+  AuthResponse,
+  Category,
+  CreateCategoryPayload,
+  CreateTicketPayload,
+  KpiData,
+  LoginPayload,
+  RegisterPayload,
+  Ticket,
+  TicketHistory,
+  UpdateTicketStatusPayload,
+  User,
+} from "@/types";
 
 // URL base de tu API de NestJS
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"; // Asegúrate de que el puerto sea correcto
@@ -132,7 +46,9 @@ export const registerUser = async (payload: RegisterPayload): Promise<User> => {
  * Inicia sesión de un usuario.
  * El payload debe coincidir con el LoginDto del backend.
  */
-export const loginUser = async (payload: LoginPayload): Promise<AuthResponse> => {
+export const loginUser = async (
+  payload: LoginPayload
+): Promise<AuthResponse> => {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -144,7 +60,6 @@ export const loginUser = async (payload: LoginPayload): Promise<AuthResponse> =>
   }
   return response.json();
 };
-
 
 /**
  * Obtiene todas las categorías desde el backend.
@@ -180,7 +95,6 @@ export const createCategory = async (
   return response.json();
 };
 
-
 export const getTickets = async (): Promise<Ticket[]> => {
   const response = await fetch(`${API_BASE_URL}/tickets`, {
     headers: getAuthHeaders(), // <-- AÑADIMOS LAS CABECERAS
@@ -201,20 +115,22 @@ export const getTicketById = async (id: string): Promise<Ticket> => {
   return response.json();
 };
 
+export const addCommentToTicket = async (
+  id: string,
+  comment: string
+): Promise<TicketHistory> => {
+  const response = await fetch(`${API_BASE_URL}/tickets/${id}/comments`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ comment }),
+  });
 
-export const addCommentToTicket = async (id: string, comment: string): Promise<TicketHistory> => {
-    const response = await fetch(`${API_BASE_URL}/tickets/${id}/comments`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ comment }),
-    });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to add comment");
+  }
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to add comment');
-    }
-
-    return response.json();
+  return response.json();
 };
 
 export const updateTicketStatus = async (

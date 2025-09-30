@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Link from 'next/link';
-import { UserRole } from '@/types/user';
+import { UserRole } from '@/types';
 
 export default function RegisterPage() {
   const { register } = useAuth();

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { UserRole } from "@/types/user";
+import { UserRole } from "@/types";
 import Header from "./Header";
 
 // Icons
