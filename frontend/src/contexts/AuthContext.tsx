@@ -2,14 +2,21 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { AuthResponse, loginUser, registerUser, User, UserRole } from '../services/api';
+import {
+  AuthResponse,
+  loginUser,
+  registerUser,
+  User,
+  LoginPayload,
+  RegisterPayload,
+} from '../services/api';
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  login: (payload: any) => Promise<void>;
-  register: (payload: any) => Promise<void>;
+  login: (payload: LoginPayload) => Promise<void>;
+  register: (payload: RegisterPayload) => Promise<void>;
   logout: () => void;
 }
 
@@ -32,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (payload: any) => {
+  const login = async (payload: LoginPayload) => {
     const data: AuthResponse = await loginUser(payload);
     setToken(data.access_token);
     setUser(data.user);
@@ -41,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/tickets'); // Redirige al dashboard principal
   };
 
-  const register = async (payload: any) => {
+  const register = async (payload: RegisterPayload) => {
     await registerUser(payload);
     // Después de un registro exitoso, redirige al login
     router.push('/login');
