@@ -2,6 +2,7 @@ import React from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { MainFieldsProps } from "@/types";
+import { Textarea } from "../ui/textarea";
 
 export const MainFields = ({
   name,
@@ -33,12 +34,11 @@ export const MainFields = ({
           <Label htmlFor="description" className="text-gray-300">
             Descripción
           </Label>
-          <Input
-            id="description"
+          <Textarea
+            placeholder="Escribe tu comentario aquí..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="bg-gray-800 border-gray-600 h-30"
-            required
+            className="min-h-[100px] text-white bg-[#1a1a1a] border border-gray-700"
           />
         </div>
       </div>

@@ -99,7 +99,7 @@ export function CreateCategoryForm({
 
       {/* Botón de Envío */}
       <div className="flex justify-end col-span-4 mt-4">
-        <Button type="submit" disabled={isSubmitting} className="bg-gray-800">
+        <Button type="submit" disabled={isSubmitting} className="bg-gray-700">
           {isSubmitting ? "Creando..." : "Crear Categoría"}
         </Button>
       </div>
