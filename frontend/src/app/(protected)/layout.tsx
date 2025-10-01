@@ -15,7 +15,7 @@ export default function ProtectedLayout({
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push("/login");
+      router.push("/");
     }
   }, [user, isLoading, router]);
 

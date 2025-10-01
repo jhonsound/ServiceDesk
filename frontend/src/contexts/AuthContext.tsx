@@ -42,13 +42,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
     localStorage.setItem('authToken', data.access_token);
     localStorage.setItem('authUser', JSON.stringify(data.user));
+    document.cookie = `token=${data.access_token}; path=/`;
     router.push('/tickets'); // Redirige al dashboard principal
   };
 
   const register = async (payload: RegisterPayload) => {
     await registerUser(payload);
     // Después de un registro exitoso, redirige al login
-    router.push('/login');
+    router.push('/');
   };
 
   const logout = () => {
@@ -56,7 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     localStorage.removeItem('authToken');
     localStorage.removeItem('authUser');
-    router.push('/login');
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    router.push('/');
   };
 
   const value = { user, token, isLoading, login, register, logout };
