@@ -32,6 +32,7 @@ export default function TicketDetailView() {
         setIsLoading(true);
         try {
           const data = await getTicketById(id);
+          console.log("🚀 ~ fetchTicket ~ data:", data)
           setTicket(data);
         } catch {
           setError("No se pudo cargar el ticket.");
@@ -73,15 +74,9 @@ export default function TicketDetailView() {
     setIsLoading(true);
     setError(null);
     try {
-      const newHistoryEntry = await addCommentToTicket(ticket!.id, newComment);
-
-      setTicket((prevTicket) => {
-        if (!prevTicket) return null;
-        return {
-          ...prevTicket,
-          history: [...prevTicket.history, newHistoryEntry],
-        };
-      });
+      await addCommentToTicket(ticket!.id, newComment);
+      const freshTicketData = await getTicketById(ticket!.id);
+      setTicket(freshTicketData);
 
       setNewComment("");
     } catch (err) {

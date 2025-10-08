@@ -240,4 +240,18 @@ export class TicketsService {
       );
     }
   }
+
+  async removeMultiple(ids: string[]): Promise<void> {
+    console.log("🚀 ~ TicketsService ~ removeMultiple ~ ids:", ids)
+    try {
+      await this.deleteTickets(ids);
+    } catch (error) {
+      console.error('Error deleting tickets:', error);
+      throw error;
+    }
+  }
+
+  private async deleteTickets(ids: string[]): Promise<void> {
+    await this.ticketRepository.delete(ids);
+  }
 }

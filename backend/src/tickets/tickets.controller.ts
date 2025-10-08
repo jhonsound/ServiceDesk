@@ -1,6 +1,6 @@
 // src/tickets/tickets.controller.ts
 
-import { Controller, Post, Body, Get, Param, Patch, NotFoundException, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, NotFoundException, UseGuards, Req, Delete } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketStatusDto } from './dto/update-ticket-status.dto';
@@ -56,5 +56,10 @@ export class TicketsController {
     const currentUser = req.user as User;
     if (!currentUser) throw new NotFoundException(`user with not found`);
     return this.ticketsService.changeStatus(id, updateTicketStatusDto, currentUser);
+  }
+
+  @Delete()
+  removeMultiple(@Body('ids') ids: string[]) {
+    return this.ticketsService.removeMultiple(ids);
   }
 }

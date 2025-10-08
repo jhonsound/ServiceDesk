@@ -66,7 +66,7 @@ export default function TicketsListPage() {
           <CardTitle className="text-white">Cola de Tickets</CardTitle>
         </CardHeader>
         <CardContent>
-          <TableTicket tickets={tickets} />
+          <TableTicket tickets={tickets} setTickets={setTickets} />
         </CardContent>
       </Card>
     </div>

@@ -13,7 +13,7 @@ import {
 } from "@/types";
 
 // URL base de tu API de NestJS
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"; // Asegúrate de que el puerto sea correcto
+const API_BASE_URL = /* process.env.NEXT_PUBLIC_API_URL ||  */"http://localhost:5000"; // Asegúrate de que el puerto sea correcto
 
 // --- NUEVA FUNCIÓN AUXILIAR ---
 // Esta función nos ayudará a obtener las cabeceras de autenticación
@@ -185,4 +185,17 @@ export const getKpis = async (): Promise<KpiData> => {
     throw new Error("Failed to fetch KPI data");
   }
   return response.json();
+};
+
+export const deleteTickets = async (ids: string[]): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/tickets`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ ids }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to delete tickets');
+  }
 };
