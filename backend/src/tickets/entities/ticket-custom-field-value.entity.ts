@@ -10,7 +10,7 @@ export class TicketCustomFieldValue {
   @Column('text')
   value: string;
 
-  @ManyToOne(() => Ticket, (ticket) => ticket.customFieldValues)
+  @ManyToOne(() => Ticket, (ticket) => ticket.customFieldValues, { onDelete: 'CASCADE' })
   ticket: Ticket;
 
   @ManyToOne(() => CustomField, { eager: true }) // eager para obtener info del campo

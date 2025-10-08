@@ -39,7 +39,7 @@ export class TicketHistory {
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
-  @ManyToOne(() => Ticket, (ticket) => ticket.history)
+  @ManyToOne(() => Ticket, (ticket) => ticket.history, { onDelete: 'CASCADE' })
   ticket: Ticket;
 
   @ManyToOne(() => User, { eager: true }) // eager para cargar siempre el usuario
