@@ -1,17 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LogOut } from "lucide-react";
+
 import { Badge } from "../ui/badge";
 
 // El título del header puede cambiar según la página, así que lo pasamos como prop

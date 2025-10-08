@@ -13,7 +13,7 @@ import {
 } from "@/types";
 
 // URL base de tu API de NestJS
-const API_BASE_URL = /* process.env.NEXT_PUBLIC_API_URL ||  */"http://localhost:5000"; // Asegúrate de que el puerto sea correcto
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"; // Asegúrate de que el puerto sea correcto
 
 // --- NUEVA FUNCIÓN AUXILIAR ---
 // Esta función nos ayudará a obtener las cabeceras de autenticación
